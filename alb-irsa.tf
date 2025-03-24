@@ -1,13 +1,9 @@
-data "aws_eks_cluster" "eks" {
-  name = module.eks.cluster_name
-}
-
 data "aws_eks_cluster_auth" "eks" {
   name = module.eks.cluster_name
 }
 
 data "aws_iam_openid_connect_provider" "oidc" {
-  url = data.aws_eks_cluster.eks.identity[0].oidc[0].issuer
+  arn = module.eks.oidc_provider_arn
 }
 
 resource "aws_iam_role" "aws_lb_controller_irsa" {
@@ -19,13 +15,13 @@ resource "aws_iam_role" "aws_lb_controller_irsa" {
       {
         Effect = "Allow",
         Principal = {
-          Federated = data.aws_iam_openid_connect_provider.oidc.arn
+          Federated = module.eks.oidc_provider_arn
         },
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {
           StringEquals = {
-            "${data.aws_iam_openid_connect_provider.oidc.url}:aud" = "sts.amazonaws.com",
-            "${data.aws_iam_openid_connect_provider.oidc.url}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
+            "${module.eks.oidc_provider}:aud" = "sts.amazonaws.com",
+            "${module.eks.oidc_provider}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
           }
         }
       }
