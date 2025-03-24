@@ -2,7 +2,7 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.0"
 
-  cluster_name    = "rg-eks-cluster"
+  cluster_name    = "demo-app-eks-cluster"
   cluster_version = "1.31"
 
   vpc_id     = module.vpc.vpc_id
@@ -25,7 +25,7 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    example = {
+    demo-app = {
       ami_type       = "AL2_x86_64"
       instance_types = ["t3.medium"]
       capacity_type  = "SPOT"
@@ -36,8 +36,8 @@ module "eks" {
   }
 
   tags = {
-    Environment = "dev"
     Terraform   = "true"
+    Environment = "demo"
     CreatedBy   = "terraform-user"
   }
 }

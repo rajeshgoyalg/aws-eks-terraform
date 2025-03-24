@@ -2,7 +2,7 @@ module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
   version = "5.0.0"
 
-  name = "rg-vpc"
+  name = "demo-app-vpc"
   cidr = "10.0.0.0/16"
 
   azs             = ["ap-southeast-1a", "ap-southeast-1b"]
@@ -24,7 +24,7 @@ module "vpc" {
 
   tags = {
     Terraform   = "true"
-    Environment = "dev"
+    Environment = "demo"
     CreatedBy   = "terraform-user"
   }
 }
