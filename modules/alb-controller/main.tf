@@ -1,43 +1,39 @@
+# ALB Controller Module - Installs AWS Load Balancer Controller via Helm
 resource "helm_release" "aws_lb_controller" {
-  name       = "aws-load-balancer-controller"
+  name       = var.helm_release_name
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
   namespace  = "kube-system"
-  version    = "1.7.1"
+  version    = var.helm_chart_version
   create_namespace = false
 
   depends_on = [
-    aws_iam_role.aws_lb_controller_irsa,
-    module.eks
+    var.alb_controller_role_arn,
+    var.eks_cluster_name
   ]
 
-  set { # clusterName
+  set {
     name  = "clusterName"
-    value = module.eks.cluster_name
+    value = var.eks_cluster_name
   }
-
-  set { # region
+  set {
     name  = "region"
-    value = "ap-southeast-1"
+    value = var.aws_region
   }
-
-  set { # vpcId
+  set {
     name  = "vpcId"
-    value = module.vpc.vpc_id
+    value = var.vpc_id
   }
-
   set {
     name  = "serviceAccount.create"
     value = "true"
   }
-
   set {
     name  = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
+    value = var.service_account_name
   }
-
   set {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = aws_iam_role.aws_lb_controller_irsa.arn
+    value = var.alb_controller_role_arn
   }
 }
