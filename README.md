@@ -207,6 +207,31 @@ terraform apply -var-file=terraform.tfvars
 aws eks update-kubeconfig --region ap-southeast-1 --name demo-app-eks-cluster
 ```
 
+## Deploy Your Microservices
+Clone the manifests repo:
+`git clone https://github.com/rajeshgoyalg/demo-kubernetes-configs`
+`cd demo-kubernetes-configs`
+
+## Apply resources:
+```
+kubectl apply -f demo-flask-app/deployment.yaml
+kubectl apply -f demo-flask-app/service.yaml
+kubectl apply -f demo-flask-app/ingress.yaml
+```
+## ✅ Verify and Test
+
+Check resources:
+```
+kubectl get deployments
+kubectl get pods
+kubectl get services
+kubectl get ingress
+```
+The output will display the ADDRESS field, which contains the ALB URL.
+
+Test your service:
+`curl http://<ALB-URL>/`
+
 ---
 
 ## Troubleshooting
