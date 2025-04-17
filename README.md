@@ -48,10 +48,9 @@ VPC (modules/vpc)
 ## Folder Structure
 
 ```
-terraformization/
+aws-eks-terraform/
 ├── backend.tf
 ├── iam-policy.json
-├── ingress.json
 ├── main.tf
 ├── modules/
 │   ├── alb-controller/
@@ -71,8 +70,8 @@ terraformization/
 
 ### 1. Clone the Repository
 ```sh
-git clone <your-repo-url>
-cd terraformization
+git clone git@github.com:rajeshgoyalg/aws-eks-terraform.git
+cd aws-eks-terraform
 ```
 
 ### 2. Configure Backend (Optional)
@@ -92,7 +91,7 @@ terraform plan -var-file=terraform.tfvars
 terraform apply -var-file=terraform.tfvars
 ```
 
-### 6. (Optional) Access the Cluster
+### 6. Access the Cluster
 After apply, configure your kubeconfig:
 ```sh
 aws eks update-kubeconfig --region <aws_region> --name <cluster_name>
@@ -103,6 +102,31 @@ Check that the AWS Load Balancer Controller is running in the `kube-system` name
 ```sh
 kubectl get pods -n kube-system -l app.kubernetes.io/name=aws-load-balancer-controller
 ```
+
+## 8. Deploy Your Microservices
+Clone the manifests repo:
+`git clone https://github.com/rajeshgoyalg/demo-kubernetes-configs`
+`cd demo-kubernetes-configs`
+
+## Apply resources:
+```
+kubectl apply -f demo-flask-app/deployment.yaml
+kubectl apply -f demo-flask-app/service_eks.yaml
+kubectl apply -f demo-flask-app/ingress_eks.yaml
+```
+## ✅ Verify and Test
+
+Check resources:
+```
+kubectl get deployments
+kubectl get pods
+kubectl get services
+kubectl get ingress
+```
+The output will display the ADDRESS field, which contains the ALB URL.
+
+Test your service:
+`curl http://<ALB-URL>/`
 
 ---
 
@@ -188,52 +212,6 @@ Key outputs from the root and modules:
 
 ---
 
-## Usage Example
-
-```sh
-# Initialize
-terraform init
-
-# Validate
-terraform validate
-
-# Plan
-terraform plan -var-file=terraform.tfvars
-
-# Apply
-terraform apply -var-file=terraform.tfvars
-
-# Update kubeconfig for kubectl
-aws eks update-kubeconfig --region ap-southeast-1 --name demo-app-eks-cluster
-```
-
-## Deploy Your Microservices
-Clone the manifests repo:
-`git clone https://github.com/rajeshgoyalg/demo-kubernetes-configs`
-`cd demo-kubernetes-configs`
-
-## Apply resources:
-```
-kubectl apply -f demo-flask-app/deployment.yaml
-kubectl apply -f demo-flask-app/service.yaml
-kubectl apply -f demo-flask-app/ingress.yaml
-```
-## ✅ Verify and Test
-
-Check resources:
-```
-kubectl get deployments
-kubectl get pods
-kubectl get services
-kubectl get ingress
-```
-The output will display the ADDRESS field, which contains the ALB URL.
-
-Test your service:
-`curl http://<ALB-URL>/`
-
----
-
 ## Troubleshooting
 
 - **ALB Not Created**: Ensure subnets are tagged with `kubernetes.io/role/elb` or `kubernetes.io/role/internal-elb`.
@@ -242,10 +220,6 @@ Test your service:
 - **State Locking Errors**: Check S3 bucket and DynamoDB table for backend state.
 
 ---
-
-## License
-
-MIT License. See [LICENSE](../LICENSE) for details.
 
 ## Contributions
 
